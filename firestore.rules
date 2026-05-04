@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isAdmin() {
+      return isEmailVerified() && request.auth.token.email == 'vanminhnguyen382@gmail.com';
+    }
+
+    // --- Validation Helpers ---
+
+    function isValidSensorData(data) {
+      return data.keys().hasAll(['timestamp', 'moisture', 'ph', 'temperature', 'pressure']) 
+        && data.keys().size() == 5
+        && data.timestamp is string && data.timestamp.size() <= 64
+        && data.moisture is number && data.moisture >= 0 && data.moisture <= 100
+        && data.ph is number && data.ph >= 0 && data.ph <= 14
+        && data.temperature is number && data.temperature >= -50 && data.temperature <= 100
+        && data.pressure is number && data.pressure >= 0 && data.pressure <= 1000;
+    }
+
+    function isValidHealthInsight(data) {
+      return data.keys().hasAll(['timestamp', 'status', 'prediction', 'recommendation'])
+        && data.keys().size() == 4
+        && data.timestamp is string && data.timestamp.size() <= 64
+        && data.status in ['normal', 'warning', 'critical']
+        && data.prediction is string && data.prediction.size() <= 2000
+        && data.recommendation is string && data.recommendation.size() <= 2000;
+    }
+
+    // --- Collections ---
+
+    match /readings/{readingId} {
+      allow list: if isSignedIn();
+      allow get: if isSignedIn();
+      
+      // For demo purposes, we allow signed in users to create readings.
+      // In a real app, this might be restricted to a specific service account or device.
+      allow create: if isEmailVerified() && isValidId(readingId) && isValidSensorData(incoming());
+      
+      // Updates and deletes are restricted
+      allow update: if isAdmin() && isValidSensorData(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /insights/{insightId} {
+      allow list: if isSignedIn();
+      allow get: if isSignedIn();
+      
+      // Only admins (or the AI service) can create insights. 
+      // Using email check for simplicity in this demo environment.
+      allow create: if isAdmin() && isValidId(insightId) && isValidHealthInsight(incoming());
+      
+      allow update: if isAdmin() && isValidHealthInsight(incoming());
+      allow delete: if isAdmin();
+    }
+  }
+}
