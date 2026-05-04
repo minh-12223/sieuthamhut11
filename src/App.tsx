@@ -99,12 +99,12 @@ export default function App() {
   const latest = dataHistory[dataHistory.length - 1];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans p-4 md:p-8">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans p-4 md:p-8 xl:p-12">
       {fbError && (
         <motion.div 
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
-          className="max-w-7xl mx-auto mb-6 bg-red-50 border border-red-100 p-4 rounded-2xl flex items-center gap-3 text-red-700 text-sm font-bold shadow-sm"
+          className="max-w-[1400px] mx-auto mb-6 bg-red-50 border border-red-100 p-4 rounded-2xl flex items-center gap-3 text-red-700 text-sm font-bold shadow-sm"
         >
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <p>{fbError}</p>
@@ -113,7 +113,7 @@ export default function App() {
           </button>
         </motion.div>
       )}
-      <header className="max-w-7xl mx-auto mb-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <header className="max-w-[1400px] mx-auto mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="bg-indigo-600 p-3 rounded-2xl shadow-lg shadow-indigo-100">
             <Activity className="w-8 h-8 text-white" />
@@ -149,10 +149,10 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Sensor Cards */}
-        <div className="lg:col-span-2 space-y-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <main className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Sensor Cards & Charts */}
+        <div className="lg:col-span-7 space-y-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
             <SensorCard 
               title="Độ ẩm" 
               value={latest ? `${latest.moisture.toFixed(1)}%` : "--"} 
@@ -194,7 +194,7 @@ export default function App() {
                 <p className="text-sm text-slate-400 font-medium">Dữ liệu cập nhật trực tiếp từ kho lưu trữ đám mây</p>
               </div>
             </div>
-            <div className="h-[350px] w-full">
+            <div className="h-[420px] w-full">
               {dataHistory.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={dataHistory}>
@@ -250,8 +250,8 @@ export default function App() {
         </div>
 
         {/* AI Analysis Panel */}
-        <div className="lg:col-span-1 space-y-8">
-          <section className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 h-full relative overflow-hidden">
+        <div className="lg:col-span-5 space-y-8">
+          <section className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 relative overflow-hidden min-h-[600px]">
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full -mr-16 -mt-16 opacity-50" />
             
             <h3 className="font-extrabold text-slate-900 mb-8 flex items-center gap-2 relative">
@@ -358,7 +358,7 @@ export default function App() {
         </div>
       </main>
 
-      <footer className="max-w-7xl mx-auto mt-16 pb-12 text-center">
+      <footer className="max-w-[1400px] mx-auto mt-20 pb-12 text-center">
         <div className="w-12 h-1 bg-slate-200 mx-auto mb-6 rounded-full opacity-50" />
         <p className="font-black text-slate-300 uppercase tracking-[0.3em] text-[10px]">
           © 2026 Visionary Health Monitor • Advanced Bio-Material Analysis
